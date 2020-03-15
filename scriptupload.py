@@ -16,8 +16,7 @@ firebase=firebase.FirebaseApplication("https://recordfirebase.firebaseio.com/")
 client=storage.Client();
 bucket=client.get_bucket("recordfirebase.appspot.com")
 imageBlob = bucket.blob("/")
-#imagePath = [os.path.join(self.path,f) for f in os.listdir(self.path)]
-imagePath = "./"
 
-imageBlob = bucket.blob("DSC07832.jpg")
-imageBlob.upload_from_filename(imagePath)
+imageBlob.upload_from_filename('mom phone/pictures/20190602_193223.jpg')
+    
+    
