@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "recordfirebase",
+  "private_key_id": "97cba9d6313bff7635a2f609fd30df92ef633db8",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDyMOJNLpmEzLL+\nLxlamT10/a86RqnpwZF52UP37gJjLTxb5C94X4MC0aqmsFUrtDGjTjjg3kCAwvh0\ne2uxOoZPTQ503BZOh6BImz6nN+6u+jIvqAK6ZXsi3Hq+HFHavwgnqOiN6Ejz9K7U\ngce77j9nxQXPOs+dPQ5oYXTnv1LhUNJL2jHhFi3NVQBRgDwUmVEZQEgeYWbLXeco\noHp9cR6izxmIyzkz+93zzfD28FmcJj/qxZ+6CXeZwdJW0n1fMBfzpLUR1RqnRCVJ\n8UbkKpvScmwi7BV0h3VNG9i40NtxlJLZNA+u28cu7pJsA4fF2L4Okgvts6wnP2+M\nJWNc/1rrAgMBAAECggEAWFp+DGMuLVTSDcnX6YXS9k2f8dYaoYT00etxkM66/zxe\n8zUFHlhVvp8HrwTQJX/4xddBB8P86xx1sGTgLkkn+2Ekn3w1BRQUZLiB/FX61MnA\nqkMUL7Ta3aZqftVtBSzAyFsl77Mofhsq9qqb15L8fZpSWr3dRMMj8O9wyySwkzKH\nvsfiXPz/RoKuiujLpJuSIU0U5w2rCzjrT7qD/kD+/O8HJcEpGIjFfu7V3AZzjGBc\n+NNAaaI6e6lEz5ndeoity2PYbF8EFNDUUynnAoEOfZqlOjATaCtBHizX+4eaS4ZI\n3g2PI5JfG+MvvsOPQiyD6GslV0PUe90KjKBGGJXddQKBgQD65gXk3lWSZinwgMhQ\namYDXw9B4XBipT4I1H3ATaZsDoDcX+wiqXpue3BQ5gNaGmey0F35dzPKJZMhh1ep\nn/oHlLWSEPrAY8gp4sD4OJArfc7M8cJTRp1ZDqDsxoSh8SoiWTRPPzPIZE0qZFby\njqEhFAJy6GePZTXU3yUjBHCA3QKBgQD3HYlLFxJCcJNAHEcOxpbKKm+TSU7QEaF4\nt+YwrEF5IQiywGqlTUl2Mpj36BAK+1LPBvJtOpahb5SwxN9ElAKYSnyXCx3hP9bg\nXIQpQQaMCNbhYdYL3Zyo9RCOoHAmbiMiU4w0g7+sRt8mUZLwLbz5XnjQlTLjX9w7\nbk4f4eBqZwKBgESTxL6myqrmQ8ZZ3Oal/lYjkG8IaIh98/PD6M88KiXU3QHfMhLT\nUgSKtstV40qodvmYHGeIXl59YLbEYICbmmKiEfLnszIM0/Qm52mxRC6vB2xbFCtg\n3Lcv2Wp+ZFhDK6oRyctzUfsO90yD+oP32jDJYFX6EfxOxKT3jRYCK6H9AoGBAL7D\nblkpVk8z2HiFW9VsOLuYRsnMraqx8ZTfYjPwxhpcBfr3z1wMbclxBeVaoAfaO/LV\nyg/ISsAVAxPy5uhp2hb2aXewfUCFp7tLsDqomAVCTZ9vh21hhq5ngICaGfmQzE6T\ncIiZrD2x+FH8ZxJCPL/Ezj827jHYroqyfFzgYf3BAoGBAJhAeYVmoGJ7rMbLZpAN\n5tGmHl+CEVt9iHPs72efBINrK5Z560N0LlLQ6A7mhAcVk8sNwooFihhvSJHCnwi7\nk/WLaqkl+44FRLTKrJQhUZJb7trfJAEPZk/zAK4tuUDzkTnjDFvelPfr8IROh2hg\n0jDmckVfW45iSeqaLCd2L0qh\n-----END PRIVATE KEY-----\n",
+  "client_email": "recordfirebase@appspot.gserviceaccount.com",
+  "client_id": "113634630538727660440",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/recordfirebase%40appspot.gserviceaccount.com"
+}
