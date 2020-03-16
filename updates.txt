@@ -1,0 +1,327 @@
+package com.example.myapplication;
+
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.util.Log;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.Random;
+
+public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private NotificationManager notificationManager;
+    private String  ADMIN_CHANNEL_ID = "admin_channel";
+    public String title;
+    private String body;
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+        Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle(remoteMessage.getData().get("title"))
+                .setContentText(remoteMessage.getData().get("body"))
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build();
+        title= remoteMessage.getData().get("title");
+        body = remoteMessage.getData().get("body");
+        Log.e("notification", "onMessageReceived: " +title+" "+body);
+        NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
+        manager.notify(123, notification);
+        Intent intent = new Intent(this, CameraActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0 /* request code */, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+    }
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setupChannels() {
+        CharSequence adminChannelName = getString(R.string.notifications_admin_channel_name);
+        String adminChannelDescription = getString(R.string.notifications_admin_channel_description);
+
+        NotificationChannel adminChannel;
+        adminChannel = new NotificationChannel(ADMIN_CHANNEL_ID, adminChannelName, NotificationManager.IMPORTANCE_LOW);
+        adminChannel.setDescription(adminChannelDescription);
+        adminChannel.enableLights(true);
+        adminChannel.setLightColor(Color.RED);
+        adminChannel.enableVibration(true);
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(adminChannel);
+        }
+
+
+    }
+}
+
+
+
+
+
+manifest changes
+
+
+
+   <service android:name=".MyFirebaseMessagingService">
+        <intent-filter>
+            <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+        </intent-filter>
+    </service>
+
+        <service android:name=".MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
+
+
+main Activity
+
+
+
+package com.example.myapplication;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.media.MediaRecorder;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class MainActivity extends AppCompatActivity {
+    private Button mrecordBtn;
+    private TextView mrecordLabel;
+    private TextView mCamLabel;
+    private MediaRecorder recorder;
+    private MediaRecorder recorder2;
+
+    private String fileName=null;
+    private String fileName2=null;
+
+    public static final String TAG="yashi";
+    private StorageReference mstorage;
+    private StorageReference mstorage2;
+    private ProgressDialog mProgress;
+
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mrecordBtn = findViewById(R.id.record);
+        mrecordLabel= findViewById(R.id.textDisplay);
+        mCamLabel= findViewById(R.id.camText);
+        mstorage= FirebaseStorage.getInstance().getReference();
+        mstorage2= FirebaseStorage.getInstance().getReference();
+
+        mProgress = new ProgressDialog(this);
+
+        fileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+        fileName += "/mainmic.m4a";
+        fileName2 = Environment.getExternalStorageDirectory().getAbsolutePath();
+        fileName2 += "/camcordermic.m4a";
+
+        mrecordBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction()==MotionEvent.ACTION_DOWN){
+                    startRecording();
+                    mrecordLabel.setText("Recording Started");
+                    mCamLabel.setText("Cam recording on....");
+                }else if(event.getAction()==MotionEvent.ACTION_UP){
+                    stopRecording();
+                    mrecordLabel.setText("Recording Stopped...");
+                    mCamLabel.setText("cam recording done");
+
+                }
+
+                return false;
+            }
+        });
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(MainActivity.this,new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String newToken = instanceIdResult.getToken();
+            }
+        });
+
+    }
+
+    private void startRecording() {
+        recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        recorder.setOutputFile(fileName);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        recorder2 = new MediaRecorder();
+        recorder2.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        recorder2.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        recorder2.setOutputFile(fileName2);
+        recorder2.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        try {
+            recorder.prepare();
+            recorder2.prepare();
+        } catch (IOException e) {
+            Log.e(TAG, "prepare() failed");
+        }
+
+        recorder.start();
+try{
+    recorder2.start();
+}catch (IllegalStateException er){
+    Log.e(TAG, "startRecording: "+er );
+}
+
+        }
+
+
+    private void stopRecording() {
+        recorder.stop();
+        recorder.release();
+
+try{
+    recorder2.stop();
+    recorder2.release();
+}catch (IllegalStateException e){
+    Log.e(TAG, "exception" + e );
+}
+
+        Log.e(TAG, "stopRecording: "+ fileName +"     "+fileName2 );
+        recorder = null;
+        recorder2 = null;
+
+        uploadAudio();
+    }
+
+    private void uploadAudio() {
+        mProgress.setMessage("Uploading Audio");
+        mProgress.show();
+        StorageReference filepath= mstorage.child("Audio").child("mainmic.m4a");
+        StorageReference filepath2= mstorage2.child("Audio").child("camcordermic.m4a");
+        Uri uri = Uri.fromFile(new File(fileName));
+        Uri uri2 = Uri.fromFile(new File(fileName2));
+//        try{
+//            InputStream stream = new FileInputStream(new File("/storage/emulated/0/audiorecordtest.3gp"));
+//          UploadTask uploadTask = mstorage.putStream(stream);
+//            uploadTask.addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(Exception exception) {
+//                    mProgress.dismiss();
+//                    Log.e(TAG, "onFailure: "+exception );
+//                                    }
+//            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    mProgress.dismiss();
+//                    mrecordLabel.setText("Uploading Done");
+//                }
+//            });
+//
+//        }catch(IOException e){
+//            Log.e(TAG, "uploadAudio: " + e );
+//        }
+
+
+
+        filepath.putFile(uri).addOnSuccessListener(this,new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                mProgress.dismiss();
+                mrecordLabel.setText("Uploading Done");
+            }
+        });
+        filepath2.putFile(uri2).addOnSuccessListener(this,new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                mCamLabel.setText("Cam Audio Uploading Done");
+            }
+        });
+//
+//
+//
+//        filepath.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+//            @Override
+//            public void onComplete(Task<UploadTask.TaskSnapshot> task) {
+//                mProgress.dismiss();
+//                mrecordLabel.setText("Uploading Done");
+//            }
+//        });
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            String token = FirebaseInstanceId.getInstance().getToken();
+            Log.i(TAG, "FCM Registration Token: " + token);
+        }
+        else{
+            signInAnonymously();
+        }
+    }
+
+    private void signInAnonymously() {
+        mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                String token = FirebaseInstanceId.getInstance().getToken();
+                Log.i(TAG, "FCM Registration Token: " + token);            }
+        })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e(TAG, "signInAnonymously:FAILURE", exception);
+                    }
+                });
+    }
+}
+
